@@ -35,19 +35,24 @@ import com.jinwei.lunarclock.R;
  * Created by jinwei on 16-4-6.
  */
 public class ClockService extends Service {
-
+    private RemoteViews rViews;
     // 表针
-    private Drawable mHourHand;
-    private Drawable mMinuteHand;
-    private Bitmap mMinuteBitmap;
+    //private Drawable mHourHand;
+    //private Drawable mMinuteHand;
+    //private Bitmap mMinuteBitmap;
+    //指针Bitmap
+    private Bitmap clock_pbm;
+    //表盘Bitmap
+    //private Bitmap clock_dbm;
     // 定时器
     private Timer timer;
     // 日期格式
-    private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    //private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     // 时分秒指针paint定义
     Paint sec_paint;
     Paint min_paint;
     Paint hour_paint;
+    Paint dial_paint;
     // 时分秒指针长度
     int sec_plen = 72;
     int min_plen = 68;
@@ -62,7 +67,6 @@ public class ClockService extends Service {
     public void onCreate() {
         // TODO Auto-generated method stub
         super.onCreate();
-
         // 秒针指针样式
         sec_paint = new Paint();
         sec_paint.setStyle(Paint.Style.FILL);
@@ -87,6 +91,28 @@ public class ClockService extends Service {
         hour_paint.setTypeface(Typeface.MONOSPACE);
         hour_paint.setStrokeWidth(2.8f);
 
+        // 表盘样式
+        dial_paint = new Paint();
+        dial_paint.setStyle(Paint.Style.FILL);
+        dial_paint.setAntiAlias(true);
+        dial_paint.setTypeface(Typeface.MONOSPACE);
+
+        rViews = new RemoteViews(getPackageName(),
+                R.layout.widget_clock);
+        clock_pbm = Bitmap.createBitmap(wWidth, wHeight, Bitmap.Config.ARGB_4444);
+        // TODO 绘制表盘
+        //Drawable clock_dialhand = ContextCompat.getDrawable(this, R.drawable.clock_lunar_dial);
+        //clock_dbm = drawableToBitmap(clock_dialhand);
+        //Canvas dc = new Canvas();
+        //dc.drawBitmap(clock_dbm,0,0,dial_paint);
+        //rViews.setImageViewBitmap(R.id.clock_dial, clock_dbm);
+        // 刷新
+        //AppWidgetManager manager = AppWidgetManager
+        //        .getInstance(getApplicationContext());
+        //ComponentName cName = new ComponentName(getApplicationContext(),
+        //        ClockProvider.class);
+        //manager.updateAppWidget(cName, rViews);
+
         timer = new Timer();
         /**
          * 参数：1.事件2.延时事件3.执行间隔事件
@@ -99,38 +125,40 @@ public class ClockService extends Service {
             }
         }, 0, 1000);
     }
-    
+
     /**
      * 更新事件的方法
      */
     private void updateView() {
         // 时间
-        String time = sdf.format(new Date());
+        //String time = sdf.format(new Date());
         /**
          * 参数：1.包名2.小组件布局
          */
-        RemoteViews rViews = new RemoteViews(getPackageName(),
-                R.layout.widget_clock);
+        if(rViews==null)
+            return;
         // 显示当前事件
         //rViews.setTextViewText(R.id.tv_clock, time);
         Calendar calen = Calendar.getInstance();
         int hour = calen.get(Calendar.HOUR_OF_DAY);
         int minute = calen.get(Calendar.MINUTE);
         int second = calen.get(Calendar.SECOND);
-        Bitmap bmp = Bitmap.createBitmap(180, 180, Bitmap.Config.ARGB_8888);
-        drawClockHand(bmp, sec_paint, (int)(second/60.0f*360.0f), sec_plen);
-        drawClockHand(bmp, min_paint, (int)(minute/60.0f*360.0f), min_plen);
-        drawClockHand(bmp, hour_paint, (int)(hour/60.0f*360.0f), hour_plen);
-        rViews.setImageViewBitmap(R.id.clock_pointer, bmp);
+        //Bitmap clock_pbm = Bitmap.createBitmap(wWidth, wHeight, Bitmap.Config.ARGB_8888);
+        clock_pbm.eraseColor(Color.TRANSPARENT);//清空图形
+        //clock_pbm.reconfigure(wWidth, wHeight, Bitmap.Config.ARGB_8888);
+        clock_pbm.prepareToDraw();
+        drawClockHand(clock_pbm, sec_paint, (int) (second / 60.0f * 360.0f), sec_plen);
+        drawClockHand(clock_pbm, min_paint, (int)(minute/60.0f*360.0f+second/60.0f*6.0f), min_plen);
+        drawClockHand(clock_pbm, hour_paint, (int)(hour/24.0f*360.0f+minute/60.0f*15.0f), hour_plen);
+        rViews.setImageViewBitmap(R.id.clock_pointer, clock_pbm);
         // 刷新
         AppWidgetManager manager = AppWidgetManager
                 .getInstance(getApplicationContext());
         ComponentName cName = new ComponentName(getApplicationContext(),
                 ClockProvider.class);
         manager.updateAppWidget(cName, rViews);
-        if(bmp!=null)
-            bmp.recycle();
-
+        //if(clock_pbm!=null )
+        //    clock_pbm.recycle();
         //manager.updateAppWidget(R.id.minute_clock, rViews);
     }
 
@@ -138,7 +166,12 @@ public class ClockService extends Service {
     public void onDestroy() {
         // TODO Auto-generated method stub
         super.onDestroy();
+        timer.cancel();
         timer = null;
+        if(clock_pbm!=null && (!clock_pbm.isRecycled()))
+            clock_pbm.recycle();
+        //if(clock_dbm!=null && (!clock_dbm.isRecycled()))
+        //    clock_dbm.recycle();
     }
 
     private int wHeight = 180;

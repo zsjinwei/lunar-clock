@@ -25,10 +25,10 @@
             android:layout_gravity="center" />
 
         <ImageView
-            android:layout_width="180dp"
-            android:layout_height="180dp"
+            android:layout_width="170dp"
+            android:layout_height="170dp"
             android:id="@+id/clock_dial"
-            android:src="@drawable/clock_analog_dial"
+            android:src="@drawable/clock_lunar_dial"
             android:layout_gravity="center"
             android:layout_marginTop="-180dp" />
     </LinearLayout>
