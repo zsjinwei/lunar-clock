@@ -9,7 +9,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
-        <activity android:name=".widget.MainActivity">
+        <activity android:name=".widget.MainActivity"
+            android:icon="@drawable/clock_lunar_dial">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
