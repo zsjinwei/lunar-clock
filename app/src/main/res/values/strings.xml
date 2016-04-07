@@ -1,5 +1,8 @@
 <resources>
     <string name="app_name">Lunar Clock</string>
-    <string name="hello_world">Hello World!</string>
+    <string name="hello_world">十二时辰桌面时钟（尝鲜版）</string>
     <string name="action_settings">Settings</string>
+    <string name="author">制作：黄锦伟</string>
+    <string name="about">请在窗口小部件设置页面选择Lunar Clock.\n（如果之前已经安装过本工具，请卸载后重新安装与设置）</string>
+    <string name="copyright">Copyright @ 2016</string>
 </resources>
