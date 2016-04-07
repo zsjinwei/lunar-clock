@@ -35,7 +35,7 @@ import com.jinwei.lunarclock.R;
  * Created by jinwei on 16-4-6.
  */
 public class ClockService extends Service {
-    private RemoteViews rViews;
+    //private RemoteViews rViews;
     // 表针
     //private Drawable mHourHand;
     //private Drawable mMinuteHand;
@@ -97,8 +97,8 @@ public class ClockService extends Service {
         dial_paint.setAntiAlias(true);
         dial_paint.setTypeface(Typeface.MONOSPACE);
 
-        rViews = new RemoteViews(getPackageName(),
-                R.layout.widget_clock);
+        //rViews = new RemoteViews(getPackageName(),
+        //        R.layout.widget_clock);
         clock_pbm = Bitmap.createBitmap(wWidth, wHeight, Bitmap.Config.ARGB_4444);
         // TODO 绘制表盘
         //Drawable clock_dialhand = ContextCompat.getDrawable(this, R.drawable.clock_lunar_dial);
@@ -135,6 +135,7 @@ public class ClockService extends Service {
         /**
          * 参数：1.包名2.小组件布局
          */
+        RemoteViews rViews = new RemoteViews(getPackageName(), R.layout.widget_clock);
         if(rViews==null)
             return;
         // 显示当前事件
@@ -156,7 +157,13 @@ public class ClockService extends Service {
                 .getInstance(getApplicationContext());
         ComponentName cName = new ComponentName(getApplicationContext(),
                 ClockProvider.class);
-        manager.updateAppWidget(cName, rViews);
+        try {
+            manager.updateAppWidget(cName, rViews);
+        } catch (OutOfMemoryError ex) {
+            // 建议大家如何出现了内存不足异常，最好return 原始的bitmap对象。.
+            return;
+        }
+
         //if(clock_pbm!=null )
         //    clock_pbm.recycle();
         //manager.updateAppWidget(R.id.minute_clock, rViews);
